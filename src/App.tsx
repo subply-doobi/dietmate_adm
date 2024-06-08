@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import styled from "styled-components";
+
+import { colors } from "./shared/colors";
+import Drawer from "./components/drawer/Drawer";
+import { Outlet } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+      <Drawer />
+      <ContentContainer>
+        <Outlet />
+      </ContentContainer>
+    </Container>
   );
 }
 
 export default App;
+
+const Container = styled.div`
+  height: 100%;
+  display: flex;
+  background-color: ${colors.white};
+`;
+
+const ContentContainer = styled.div`
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0 40px 0 40px;
+  background-color: ${colors.backgroundLight};
+`;
