@@ -88,6 +88,8 @@ const Drawer = () => {
 export default Drawer;
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 20%;
   height: 100%;
   box-shadow: 2px 5px 8px 0px rgba(0, 0, 0, 0.15);

@@ -62,3 +62,14 @@ export interface IOrderedProduct {
   orderTypeCd: string;
   orderTypeNm: string;
 }
+
+export interface IOrder {
+  statusNm: "checking" | "complete" | "noStock" | "refund" | string;
+  buyerNm: string;
+  contact: string;
+  address: string;
+  price: number;
+  orderDate: string;
+  request: string;
+  orderNo: string;
+}

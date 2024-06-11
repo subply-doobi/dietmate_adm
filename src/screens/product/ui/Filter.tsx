@@ -138,7 +138,7 @@ const SearchBtn = styled.button`
   align-items: center;
   justify-content: center;
   border-radius: 5px;
-  margin-left: 20px;
+  margin-left: 40px;
 `;
 
 const SearchBtnText = styled(TextMain)`

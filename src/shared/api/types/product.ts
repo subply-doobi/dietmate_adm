@@ -41,10 +41,26 @@ export interface IProduct {
   itemReportNo: string;
 
   // temp
-  statusNm: '판매중' | '재고없음' | '영구삭제';
+  statusNm: "판매중" | "재고없음" | "영구삭제" | string;
   detailLink1: string;
   detailLink2: string;
   detailLink3: string;
   detailLink4: string;
   detailLink5: string;
+}
+
+export interface IProductSummary {
+  [key: string]: string;
+  statusNm: string;
+  mainAttUrl: string;
+  platformNm: string;
+  productNm: string;
+  price: string;
+  shippingPrice: string;
+  freeShippingPrice: string;
+  calorie: string;
+  carb: string;
+  protein: string;
+  fat: string;
+  productNo: string;
 }

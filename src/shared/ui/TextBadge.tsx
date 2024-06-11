@@ -2,15 +2,13 @@ import styled from "styled-components";
 import { TextMain } from "../ui/styledComps";
 import { colors } from "../colors";
 
-const TextBadge = ({
-  badgeText,
-  color,
-}: {
+interface ITextBadge extends React.HTMLAttributes<HTMLDivElement> {
   badgeText: string;
   color: string;
-}) => {
+}
+const TextBadge = ({ badgeText, color, style, ...otherProps }: ITextBadge) => {
   return (
-    <Box style={{ backgroundColor: color }}>
+    <Box style={{ backgroundColor: color, ...style }} {...otherProps}>
       <BadgeText>{badgeText}</BadgeText>
     </Box>
   );
@@ -19,13 +17,11 @@ const TextBadge = ({
 export default TextBadge;
 
 const Box = styled.div`
+  display: flex;
   height: 32px;
-  width: 80%;
-  padding: 0 2px;
   border-radius: 4px;
   justify-content: center;
   align-items: center;
-  align-self: center;
 `;
 
 const BadgeText = styled(TextMain)`
