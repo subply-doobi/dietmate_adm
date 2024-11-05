@@ -1,0 +1,34 @@
+@font-face {
+  font-family: "NotoSansKR";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../fonts/NotoSansKR.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NotoSansKR_medium";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../fonts/NotoSansKRMedium.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NotoSansKR_bold";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../fonts/NotoSansKRBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "NotoSansKR_black";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../fonts/NotoSansKRBlack.woff") format("woff");
+}
+
+@font-face {
+  font-family: "KotraHope";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../fonts/KotraHope.woff") format("woff");
+}

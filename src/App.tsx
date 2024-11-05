@@ -1,18 +1,38 @@
 import styled from "styled-components";
 
-import { colors } from "./shared/colors";
+import { colors } from "./shared/styles/colors";
 import Drawer from "./components/drawer/Drawer";
 import { Outlet } from "react-router-dom";
 import RightModal from "./shared/ui/RightModal";
+import Login from "./screens/login/Login";
+import { useEffect, useState } from "react";
+import { validateToken } from "./shared/api/query/token";
+import { useListAdmProduct } from "./shared/api/query/product";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const isValid = await validateToken();
+      if (isValid) setIsLoggedIn(true);
+    };
+    checkLogin();
+  }, []);
+
   return (
     <Container>
-      <Drawer />
-      <ContentContainer>
-        <Outlet />
-      </ContentContainer>
-      <RightModal />
+      {isLoggedIn ? (
+        <>
+          <Drawer />
+          <ContentContainer>
+            <Outlet />
+          </ContentContainer>
+          <RightModal />
+        </>
+      ) : (
+        <Login />
+      )}
     </Container>
   );
 }

@@ -16,38 +16,29 @@ import SquareInput from "../../../shared/ui/SquareInput";
 import ToggleBtn from "../../../shared/ui/ToggleBtn";
 import { useAppDispatch, useAppSelector } from "../../../app/reduxStore/hooks";
 import { setValue } from "../../../features/productInput/productInputSlice";
-import { colors } from "../../../shared/colors";
+import { colors } from "../../../shared/styles/colors";
 import { icons } from "../../../shared/iconSource";
+import { CATEGORY_CD_OBJ, PRODUCT_STATUS_CD_OBJ } from "../../../shared/consts";
+import { useGetAdmProduct } from "../../../shared/api/query/product";
+import { BASE_URL } from "../../../shared/api/urls";
 
-const STATUS_BTNS = ["판매중", "재고없음", "영구삭제"];
-const CATEGORY_BTNS = [
-  "도시락",
-  "샐러드",
-  "닭가슴살",
-  "영양간식",
-  "과자",
-  "음료",
-];
-
-const SUB_CATEGORY_BTNS = {
-  도시락: ["반찬있는", "볶음밥/덮밥"],
-  샐러드: ["칼로리없는", "식사대용"],
-  닭가슴살: ["일반", "스테이크", "볼"],
-  영양간식: ["프로틴바", "프로틴쿠키", "프로틴케이크"],
-  과자: ["쿠키", "마카롱", "케이크"],
-  음료: ["단백질", "식사대용"],
-};
+const LINK_INPUTS: Array<"link1" | "link2"> = ["link1", "link2"];
 
 const DETAIL_LINK_INPUTS: Array<
   "detailLink1" | "detailLink2" | "detailLink3" | "detailLink4" | "detailLink5"
 > = ["detailLink1", "detailLink2", "detailLink3", "detailLink4", "detailLink5"];
 
-const BaseInfo = () => {
+interface IBaseInfo {
+  thumbnailImg: File | null;
+  setThumbnailImg: React.Dispatch<React.SetStateAction<File | null>>;
+}
+const BaseInfo = ({ thumbnailImg, setThumbnailImg }: IBaseInfo) => {
   // redux
   const dispatch = useAppDispatch();
   const {
-    statusNm,
+    status,
     productNm,
+    platformNm,
     category,
     subCategory,
     price,
@@ -56,37 +47,37 @@ const BaseInfo = () => {
     freeShippingPrice,
     ...otherInputs
   } = useAppSelector((state) => state.productInput);
+  const { dataId } = useAppSelector((state) => state.rightModal);
 
   // useState
-  const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  console.log("BaseInfo: file: ", file);
+
+  // react-query
+  const { data: product } = useGetAdmProduct({
+    productNo: dataId,
+    enabled: dataId !== "",
+  });
 
   // etc
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setFile(files[0]);
-      setPreviewUrl(URL.createObjectURL(files[0]));
+      const file = files[0];
+      setThumbnailImg(file);
+      setPreviewUrl(URL.createObjectURL(file));
     } else {
-      setFile(null);
+      setThumbnailImg(null);
       setPreviewUrl(null);
     }
   };
 
-  const onFileUpload = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (file) {
-      // const formData = new FormData();
-      // formData.append('file', file);
-      // axios.post('http://your-server-url.com/upload', formData);
-      console.log("파일업로드!");
-    }
-  };
-
   const cancelIamge = () => {
-    setFile(null);
+    setThumbnailImg(null);
     setPreviewUrl(null);
+    const fileInput = document.getElementById("file") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = ""; // This resets the file input
+    }
   };
 
   return (
@@ -95,14 +86,12 @@ const BaseInfo = () => {
         <RowBox>
           <Title>사용유무</Title>
           <BtnRow>
-            {STATUS_BTNS.map((btn, idx) => (
+            {Object.keys(PRODUCT_STATUS_CD_OBJ).map((cd, idx) => (
               <ToggleBtn
-                key={idx}
-                btnText={btn}
-                isActive={statusNm.value === btn}
-                onClick={() =>
-                  dispatch(setValue({ key: "statusNm", value: btn }))
-                }
+                key={cd}
+                btnText={PRODUCT_STATUS_CD_OBJ[cd] || ""}
+                isActive={status.value === cd}
+                onClick={() => dispatch(setValue({ key: "status", value: cd }))}
               />
             ))}
           </BtnRow>
@@ -121,7 +110,7 @@ const BaseInfo = () => {
           <Title>판매플랫폼</Title>
           <SquareInput
             style={{ flex: 3 }}
-            value={productNm.value}
+            value={platformNm.value}
             onChange={(v) =>
               dispatch(setValue({ key: "platformNm", value: v.target.value }))
             }
@@ -130,13 +119,13 @@ const BaseInfo = () => {
         <RowBox>
           <Title>카테고리</Title>
           <BtnRow>
-            {CATEGORY_BTNS.map((btn, idx) => (
+            {Object.keys(CATEGORY_CD_OBJ).map((cd, idx) => (
               <ToggleBtn
-                key={idx}
-                btnText={btn}
-                isActive={category.value === btn}
+                key={cd}
+                btnText={CATEGORY_CD_OBJ[cd]?.cdNm || ""}
+                isActive={category.value === cd}
                 onClick={() =>
-                  dispatch(setValue({ key: "category", value: btn }))
+                  dispatch(setValue({ key: "category", value: cd }))
                 }
               />
             ))}
@@ -145,16 +134,20 @@ const BaseInfo = () => {
         <RowBox>
           <Title>하위카테고리</Title>
           <BtnRow>
-            {SUB_CATEGORY_BTNS[category.value].map((btn, idx) => (
-              <ToggleBtn
-                key={idx}
-                btnText={btn}
-                isActive={subCategory.value === btn}
-                onClick={() =>
-                  dispatch(setValue({ key: "subCategory", value: btn }))
-                }
-              />
-            ))}
+            {Object.keys(CATEGORY_CD_OBJ[category.value]?.subCategory).map(
+              (cd, idx) => (
+                <ToggleBtn
+                  key={cd}
+                  btnText={
+                    CATEGORY_CD_OBJ[category.value]?.subCategory[cd] || ""
+                  }
+                  isActive={subCategory.value === cd}
+                  onClick={() =>
+                    dispatch(setValue({ key: "subCategory", value: cd }))
+                  }
+                />
+              )
+            )}
           </BtnRow>
         </RowBox>
         <RowBox>
@@ -223,6 +216,8 @@ const BaseInfo = () => {
           <AddThumbnailBtn htmlFor="file">
             {previewUrl ? (
               <Preview src={previewUrl} alt="preview" />
+            ) : product?.mainAttUrl ? (
+              <Preview src={`${BASE_URL}${product.mainAttUrl}`} />
             ) : (
               <Icon size={36} src={icons.plus_grey_36} />
             )}
@@ -238,16 +233,43 @@ const BaseInfo = () => {
         <HorizontalSpace height={16} />
 
         <HorizontalSpace height={40} />
+        <Text>공식 쇼핑몰 및 상품페이지</Text>
+        <Col style={{ marginTop: 16, rowGap: 8 }}>
+          {LINK_INPUTS.map((key, idx) => (
+            <Row key={idx}>
+              <SquareInput
+                placeholder={idx === 0 ? "공식쇼핑몰" : "상품페이지"}
+                value={otherInputs[key].value}
+                onChange={(v) =>
+                  dispatch(setValue({ key, value: v.target.value }))
+                }
+              />
+              <SmallBtn
+                onClick={() => window.open(otherInputs[key].value, "_blank")}
+              >
+                ➡️
+              </SmallBtn>
+            </Row>
+          ))}
+        </Col>
+
+        <HorizontalSpace height={40} />
         <Text>상세이미지 링크</Text>
         <Col style={{ marginTop: 16, rowGap: 8 }}>
           {DETAIL_LINK_INPUTS.map((key, idx) => (
-            <SquareInput
-              key={idx}
-              value={otherInputs[key].value}
-              onChange={(v) =>
-                dispatch(setValue({ key, value: v.target.value }))
-              }
-            />
+            <Row key={idx}>
+              <SquareInput
+                value={otherInputs[key].value}
+                onChange={(v) =>
+                  dispatch(setValue({ key, value: v.target.value }))
+                }
+              />
+              <SmallBtn
+                onClick={() => window.open(otherInputs[key].value, "_blank")}
+              >
+                ➡️
+              </SmallBtn>
+            </Row>
           ))}
         </Col>
       </Col>
@@ -292,8 +314,8 @@ const BtnRow = styled.div`
 
 const AddThumbnailBtn = styled.label`
   display: flex;
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   align-items: center;
   justify-content: center;
 
@@ -307,7 +329,25 @@ const AddThumbnailBtn = styled.label`
 `;
 
 const Preview = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border-radius: 5px;
+`;
+
+const SmallBtn = styled.button`
+  width: 24px;
+  height: 24px;
+  background-color: ${colors.highlight};
+  font-size: 14px;
+  color: ${colors.white};
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${colors.main};
+  }
+
+  margin-left: 8px;
+  align-items: center;
+  justify-content: center;
 `;

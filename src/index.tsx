@@ -3,12 +3,16 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css";
+import "./shared/styles/font.css";
 
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Order from "./screens/order/Order";
 import Product from "./screens/product/Product";
 import { Provider } from "react-redux";
 import { store } from "./app/reduxStore/reduxStore";
+import { QueryClientProvider } from "@tanstack/react-query";
+import KakaoLogin from "./screens/login/KakaoLogin";
+import { queryClient } from "./app/reactQueryStore/reactQueryStore";
 
 const router = createBrowserRouter([
   {
@@ -25,16 +29,23 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "kakaoLogin",
+    element: <KakaoLogin />,
+  },
 ]);
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
     {/* redux store */}
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </Provider>
   </React.StrictMode>
 );

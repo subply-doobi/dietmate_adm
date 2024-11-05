@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { colors } from "../colors";
+import { colors } from "../styles/colors";
 import { Icon } from "./styledComps";
 import { icons } from "../iconSource";
 import { useAppDispatch, useAppSelector } from "../../app/reduxStore/hooks";
@@ -19,9 +19,10 @@ interface IRightModal extends React.HTMLAttributes<HTMLDivElement> {}
 export default function RightModal({}: IRightModal) {
   // redux
   const dispatch = useAppDispatch();
-  const { isRMVisible, modalOption } = useAppSelector(
+  const { isRMVisible, modalOption, dataId } = useAppSelector(
     (state) => state.rightModal
   );
+
   if (!isRMVisible) {
     return null;
   }

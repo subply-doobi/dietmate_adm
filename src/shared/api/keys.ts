@@ -1,0 +1,10 @@
+export const KL_AUTH_CODE = "KL_AUTH_CODE";
+
+export const DOOBI_TOKEN = "DOOBI_TOKEN";
+
+export const LIST_ORDER = "LIST_ORDER";
+export const LIST_ORDER_DETAIL_ALL = "LIST_ORDER_DETAIL_ALL";
+
+export const LIST_PRODUCT = "LIST_PRODUCT";
+export const GET_PRODUCT = "GET_PRODUCT";
+export const LIST_PRODUCT_DETAIL = "LIST_PRODUCT_DETAIL";

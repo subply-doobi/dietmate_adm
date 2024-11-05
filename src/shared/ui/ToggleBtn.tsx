@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { TextMain } from "../ui/styledComps";
-import { colors } from "../colors";
+import { colors } from "../styles/colors";
 
 interface IToggleBtn extends React.HTMLAttributes<HTMLButtonElement> {
   isActive: boolean;

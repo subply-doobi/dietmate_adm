@@ -1,16 +1,16 @@
 // doobi
-import {
-  HorizontalSpace,
-  Icon,
-  Row,
-  TextMain,
-} from "../../shared/ui/styledComps";
+import { HorizontalSpace, TextMain } from "../../shared/ui/styledComps";
 import styled from "styled-components";
-import { colors } from "../../shared/colors";
+import { colors } from "../../shared/styles/colors";
 import BaseInfo from "./orderRMContent/BaseInfo";
 import SellerProducts from "./orderRMContent/SellerProducts";
+import { useAppSelector } from "../../app/reduxStore/hooks";
+import { useListAdmOrderDetailAll } from "../../shared/api/query/order";
 
 const OrderRMContent = () => {
+  const { dataId } = useAppSelector((state) => state.rightModal);
+  const { data: orderDAData } = useListAdmOrderDetailAll({ orderNo: dataId });
+
   return (
     <Container>
       {/* 기본정보 */}
@@ -28,7 +28,7 @@ const OrderRMContent = () => {
         style={{ backgroundColor: colors.dark, marginTop: 24 }}
         height={2}
       />
-      <SellerProducts />
+      {orderDAData && <SellerProducts orderDAData={orderDAData} />}
     </Container>
   );
 };

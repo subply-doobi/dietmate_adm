@@ -6,8 +6,8 @@ export const validate: {
     errMsg: string;
   };
 } = {
-  statusNm: (value) => {
-    if (value === "판매중" || value === "재고없음") {
+  status: (value) => {
+    if (value) {
       return { isValid: true, errMsg: "" };
     }
     return { isValid: false, errMsg: "판매상태를 선택해주세요" };
@@ -34,7 +34,7 @@ export const validate: {
     if (value.length > 0) {
       return { isValid: true, errMsg: "" };
     }
-    return { isValid: false, errMsg: "서브카테고리를 입력해주세요" };
+    return { isValid: false, errMsg: "하위카테고리를 입력해주세요" };
   },
   price: (value) => {
     if (value.length > 0) {

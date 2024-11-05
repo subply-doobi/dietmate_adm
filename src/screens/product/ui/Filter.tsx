@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { colors } from "../../../shared/colors";
+import { colors } from "../../../shared/styles/colors";
 import { Col, Icon, Row, TextMain } from "../../../shared/ui/styledComps";
 import { icons } from "../../../shared/iconSource";
 import ToggleBtn from "../../../shared/ui/ToggleBtn";
@@ -12,13 +12,12 @@ import {
   toggleProductStatusBtn,
   setProductSearchText,
 } from "../../../features/filter/productFilterSlice";
+import { useListCode } from "../../../shared/api/query/code";
+import { useListAdmProduct } from "../../../shared/api/query/product";
+import { useEffect, useState } from "react";
+import { useResponsiveWidth } from "../../../shared/util/hooks";
 
-const FILTER_BTNS: {
-  [K in keyof IProductFilterState]: {
-    name: keyof IProductFilterState[K];
-    label: string;
-  }[];
-} = {
+const FILTER_BTNS = {
   productStatus: [
     { name: "total", label: "전체" },
     { name: "onSale", label: "판매중" },
@@ -35,24 +34,46 @@ const FILTER_BTNS: {
     { name: "beverage", label: "음료" },
   ],
   platformNm: [
-    { name: "total", label: "전체" },
+    { name: "", label: "전체" },
     { name: "포켓샐러드", label: "포켓샐러드" },
     { name: "바르닭", label: "바르닭" },
     { name: "샐러드판다", label: "샐러드판다" },
     { name: "다이어트메이트", label: "다이어트메이트" },
   ],
-  search: [],
 };
 
 const Filter = () => {
   // redux
   const dispatch = useAppDispatch();
-  const { productStatus, category, platformNm, search } = useAppSelector(
-    (state) => state.productFilter
-  );
+  const productFilterState = useAppSelector((state) => state.productFilter);
+  const { productStatus, category, platformNm, search } = productFilterState;
+
+  // react-query
+  const { refetch: refetchProduct } = useListAdmProduct({
+    enabled: false,
+    filterState: productFilterState,
+  });
+
+  const [boxWidth, setBoxWidth] = useState<string>("100%");
+  useResponsiveWidth({
+    width1: "100%",
+    width2: "70%",
+    width3: "50%",
+    bp1_2: 960,
+    bp2_3: 1600,
+    setWidth: setBoxWidth,
+  });
+
+  // useEffect
+  useEffect(() => {
+    refetchProduct();
+  }, []);
+
+  // fn
+  const searchProduct = () => refetchProduct();
 
   return (
-    <Box>
+    <Box style={{ width: boxWidth }}>
       <Col style={{ flex: 1, rowGap: 16 }}>
         {/* 날짜 */}
         <ItemRow>
@@ -62,7 +83,11 @@ const Filter = () => {
               <ToggleBtn
                 key={btn.name}
                 btnText={btn.label}
-                isActive={productStatus[btn.name]}
+                isActive={
+                  productStatus[
+                    btn.name as keyof IProductFilterState["productStatus"]
+                  ]
+                }
                 onClick={() => dispatch(toggleProductStatusBtn(btn.name))}
               />
             ))}
@@ -76,13 +101,15 @@ const Filter = () => {
               <ToggleBtn
                 key={btn.name}
                 btnText={btn.label}
-                isActive={category[btn.name]}
+                isActive={
+                  category[btn.name as keyof IProductFilterState["category"]]
+                }
                 onClick={() => dispatch(toggleCategoryBtn(btn.name))}
               />
             ))}
           </RowWrap>
         </ItemRow>
-        {/* 요청사항 */}
+        {/* 플랫폼명 */}
         <ItemRow>
           <ItemText>플랫폼명</ItemText>
           <RowWrap>
@@ -90,8 +117,15 @@ const Filter = () => {
               <ToggleBtn
                 key={btn.name}
                 btnText={btn.label}
-                isActive={platformNm[btn.name]}
-                onClick={() => dispatch(togglePlatformNmBtn(btn.name))}
+                isActive={platformNm === btn.name}
+                onClick={() => {
+                  dispatch(togglePlatformNmBtn(btn.name));
+                  if (platformNm !== btn.name) {
+                    dispatch(setProductSearchText(btn.name));
+                    return;
+                  }
+                  dispatch(setProductSearchText(""));
+                }}
               />
             ))}
           </RowWrap>
@@ -101,13 +135,14 @@ const Filter = () => {
           <ItemText>검색</ItemText>
           <SquareInput
             style={{ flex: 5 }}
-            placeholder="주문번호 | 사용자닉네임 | 주문자이름 | 배송지"
+            placeholder="제품명 | 판매 플랫폼명"
             value={search}
             onChange={(v) => dispatch(setProductSearchText(v.target.value))}
+            onKeyDown={(e) => e.key === "Enter" && searchProduct()}
           />
         </ItemRow>
       </Col>
-      <SearchBtn>
+      <SearchBtn onClick={searchProduct}>
         <Col style={{ alignItems: "center" }}>
           <Icon size={36} src={icons.search_white_36} />
           <SearchBtnText>검색</SearchBtnText>
@@ -139,6 +174,10 @@ const SearchBtn = styled.button`
   justify-content: center;
   border-radius: 5px;
   margin-left: 40px;
+  :hover {
+    cursor: pointer;
+    background-color: ${colors.darker};
+  }
 `;
 
 const SearchBtnText = styled(TextMain)`

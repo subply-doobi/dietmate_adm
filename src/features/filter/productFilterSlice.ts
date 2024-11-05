@@ -1,4 +1,5 @@
-import {PayloadAction, createSlice} from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { store } from "../../app/reduxStore/reduxStore";
 
 export interface IProductFilterState {
   productStatus: {
@@ -16,13 +17,7 @@ export interface IProductFilterState {
     chips: boolean;
     beverage: boolean;
   };
-  platformNm: {
-    total: boolean;
-    포켓샐러드: boolean;
-    바르닭: boolean;
-    샐러드판다: boolean;
-    다이어트메이트: boolean;
-  };
+  platformNm: string;
   search: string;
 }
 
@@ -42,74 +37,77 @@ const initialState = {
     chips: false,
     beverage: false,
   },
-  platformNm: {
-    total: true,
-    포켓샐러드: false,
-    바르닭: false,
-    샐러드판다: false,
-    다이어트메이트: false,
-  },
-  search: '',
+  platformNm: "",
+  search: "",
 };
 
 const productFilterSlice = createSlice({
-  name: 'productFilter',
+  name: "productFilter",
   initialState,
   reducers: {
     toggleProductStatusBtn: (
       state,
-      action: PayloadAction<keyof IProductFilterState['productStatus']>,
+      action: PayloadAction<keyof IProductFilterState["productStatus"] | string>
     ) => {
       const btn = action.payload;
 
-      if (btn === 'total' && state.productStatus.total) return;
-      if (btn === 'total' && !state.productStatus.total) {
-        const productStatusArr = Object.keys(
-          initialState.productStatus,
-        ) as Array<keyof IProductFilterState['productStatus']>;
-        productStatusArr.forEach(productStatus => {
-          productStatus !== 'total' &&
-            (state.productStatus[productStatus] = false);
-        });
-      }
-      btn !== 'total' && (state.productStatus.total = false);
-      state.productStatus[btn] = !state.productStatus[btn];
+      // if (btn === 'total' && state.productStatus.total) return;
+      // if (btn === 'total' && !state.productStatus.total) {
+      //   const productStatusArr = Object.keys(
+      //     initialState.productStatus,
+      //   ) as Array<keyof IProductFilterState['productStatus']>;
+      //   productStatusArr.forEach(productStatus => {
+      //     productStatus !== 'total' &&
+      //       (state.productStatus[productStatus] = false);
+      //   });
+      // }
+      // btn !== 'total' && (state.productStatus.total = false);
+      const productStatusArr = Object.keys(initialState.productStatus) as Array<
+        keyof IProductFilterState["productStatus"]
+      >;
+      productStatusArr.forEach((productStatus) => {
+        productStatus !== btn
+          ? (state.productStatus[productStatus] = false)
+          : (state.productStatus[productStatus] =
+              !state.productStatus[productStatus]);
+      });
+      productStatusArr.every((productStatus) => {
+        return state.productStatus[productStatus] === false;
+      }) && (state.productStatus.total = true);
     },
     toggleCategoryBtn: (
       state,
-      action: PayloadAction<keyof IProductFilterState['category']>,
+      action: PayloadAction<keyof IProductFilterState["category"] | string>
     ) => {
       const btn = action.payload;
 
-      if (btn === 'total' && state.category.total) return;
-      if (btn === 'total' && !state.category.total) {
-        const categoryArr = Object.keys(initialState.category) as Array<
-          keyof IProductFilterState['category']
-        >;
-        categoryArr.forEach(category => {
-          category !== 'total' && (state.category[category] = false);
-        });
-      }
-      btn !== 'total' && (state.category.total = false);
-      state.category[btn] = !state.category[btn];
+      // if (btn === "total" && state.category.total) return;
+      // if (btn === "total" && !state.category.total) {
+      //   const categoryArr = Object.keys(initialState.category) as Array<
+      //     keyof IProductFilterState["category"]
+      //   >;
+      //   categoryArr.forEach((category) => {
+      //     category !== "total" && (state.category[category] = false);
+      //   });
+      // }
+      // btn !== "total" && (state.category.total = false);
+      // state.category[btn] = !state.category[btn];
+      const categoryArr = Object.keys(initialState.category) as Array<
+        keyof IProductFilterState["category"]
+      >;
+      categoryArr.forEach((category) => {
+        category !== btn
+          ? (state.category[category] = false)
+          : (state.category[category] = !state.category[category]);
+      });
+      categoryArr.every((category) => {
+        return state.category[category] === false;
+      }) && (state.category.total = true);
     },
-    togglePlatformNmBtn: (
-      state,
-      action: PayloadAction<keyof IProductFilterState['platformNm']>,
-    ) => {
-      const btn = action.payload;
-
-      if (btn === 'total' && state.platformNm.total) return;
-      if (btn === 'total' && !state.platformNm.total) {
-        const platformNmArr = Object.keys(initialState.platformNm) as Array<
-          keyof IProductFilterState['platformNm']
-        >;
-        platformNmArr.forEach(platformNm => {
-          platformNm !== 'total' && (state.platformNm[platformNm] = false);
-        });
-      }
-      btn !== 'total' && (state.platformNm.total = false);
-      state.platformNm[btn] = !state.platformNm[btn];
+    togglePlatformNmBtn: (state, action: PayloadAction<string>) => {
+      state.platformNm === action.payload
+        ? (state.platformNm = "")
+        : (state.platformNm = action.payload);
     },
     setProductSearchText: (state, action: PayloadAction<string>) => {
       state.search = action.payload;

@@ -1,15 +1,13 @@
 import styled from "styled-components";
 import { Col, Icon, Row, TextMain } from "../../../shared/ui/styledComps";
-import { colors } from "../../../shared/colors";
+import { colors } from "../../../shared/styles/colors";
 import { IOrderedProduct } from "../../../shared/api/types/order";
 import { commaToNum } from "../../../shared/util/modString";
-import { regroupBySeller } from "../../../shared/util/dataTransfrom";
-import { testOrderedProducts } from "../../../shared/consts";
-import { BASE_URL } from "../../../shared/api/urls";
+import { regroupByPlatform } from "../../../shared/util/dataTransfrom";
 import { sumUpPrice } from "../../../shared/util/sumUp";
 import { icons } from "../../../shared/iconSource";
-import { link } from "../../../shared/util/linking";
-import { redirect } from "react-router-dom";
+import { BASE_URL } from "../../../shared/api/urls";
+import { useMemo } from "react";
 
 interface ISeller {
   products: IOrderedProduct[];
@@ -60,9 +58,17 @@ const Seller = ({ products }: ISeller) => {
   );
 };
 
-const SellerProducts = () => {
-  const orderedProducts = testOrderedProducts;
-  const productsBySeller = regroupBySeller(orderedProducts);
+const SellerProducts = ({
+  orderDAData,
+}: {
+  orderDAData: IOrderedProduct[];
+}) => {
+  const { productsBySeller } = useMemo(() => {
+    if (!orderDAData) return { productsBySeller: {} };
+    const productsBySeller = regroupByPlatform(orderDAData);
+    return { productsBySeller };
+  }, [orderDAData]);
+
   const sellerArr = Object.keys(productsBySeller);
 
   return (

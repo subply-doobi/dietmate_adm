@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { colors } from "../../shared/colors";
+import { colors } from "../../shared/styles/colors";
 import { useEffect, useState } from "react";
 import { icons } from "../../shared/iconSource";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -31,7 +31,7 @@ const Drawer = () => {
   // etc
   const currentPage = location.pathname.split("/")[1];
   const drawerWidth = isDrawerOpen ? "15%" : "72px";
-  const logoSource = require("../../shared/img/logo.png");
+  const logoSource = require("../../shared/img/appIcon.png");
 
   useEffect(() => {
     const updateWidth = () => {
@@ -55,7 +55,7 @@ const Drawer = () => {
         }}
       >
         <Logo src={logoSource} alt="logo" />
-        {isDrawerOpen && <LogoText>DM관리자</LogoText>}
+        {isDrawerOpen && <LogoText>근의공식 관리자</LogoText>}
       </LogoBox>
       <HorizontalSpace height={72} />
       {PAGES.map((page, index) => {

@@ -13,13 +13,14 @@ import { useMemo, useState } from "react";
 import { IOrder } from "../../shared/api/types/order";
 import ClientFilter from "./ClientFilter";
 import styled from "styled-components";
-import { colors } from "../../shared/colors";
+import { colors } from "../../shared/styles/colors";
 import { HorizontalSpace, Row, TextMain } from "../../shared/ui/styledComps";
 import Cell from "./Cell";
 import TextBadge from "../../shared/ui/TextBadge";
 import { openRightModal } from "../../features/modal/modalSlice";
 import { useAppDispatch } from "../../app/reduxStore/hooks";
 import { IProduct, IProductSummary } from "../../shared/api/types/product";
+import { BASE_URL } from "../../shared/api/urls";
 
 declare module "@tanstack/react-table" {
   //allows us to define custom properties for our columns
@@ -37,7 +38,7 @@ const idToLabel: {
   productNm: "제품명",
   price: "가격",
   shippingPrice: "배송비",
-  freeShippingPrice: "무료배송비",
+  freeShippingPrice: "무배",
   calorie: "칼",
   carb: "탄",
   protein: "단",
@@ -103,7 +104,7 @@ export default function ProductTable({ tableData }: ITable) {
       },
       {
         accessorKey: "mainAttUrl",
-        cell: (info) => <Thumbnail src={info.getValue()} />,
+        cell: (info) => <Thumbnail src={`${BASE_URL}${info.getValue()}`} />,
       },
       {
         accessorKey: "platformNm",
@@ -115,38 +116,38 @@ export default function ProductTable({ tableData }: ITable) {
       },
       {
         accessorKey: "price",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell>{parseInt(info.getValue(), 10)}</Cell>,
         // meta: {
         //   filterVariant: "range",
         // },
       },
       {
         accessorKey: "shippingPrice",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell>{parseInt(info.getValue(), 10)}</Cell>,
       },
       {
         accessorKey: "freeShippingPrice",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell>{parseInt(info.getValue(), 10)}</Cell>,
       },
       {
         accessorKey: "calorie",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell>{parseInt(info.getValue(), 10)}</Cell>,
       },
       {
         accessorKey: "carb",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell>{parseInt(info.getValue(), 10)}</Cell>,
       },
       {
         accessorKey: "protein",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell>{parseInt(info.getValue(), 10)}</Cell>,
       },
       {
         accessorKey: "fat",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell>{parseInt(info.getValue(), 10)}</Cell>,
       },
       {
         accessorKey: "productNo",
-        cell: (info) => <Cell>{info.getValue()}</Cell>,
+        cell: (info) => <Cell fontSize={8}>{info.getValue()}</Cell>,
       },
     ],
     []
@@ -159,17 +160,18 @@ export default function ProductTable({ tableData }: ITable) {
     state: {
       columnFilters,
     },
+    autoResetPageIndex: false,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(), //client side filtering
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    debugTable: true,
-    debugHeaders: true,
+    debugTable: false,
+    debugHeaders: false,
     debugColumns: false,
   });
 
-  const onRowPress = (dataId: string) => {
+  const openProductPage = (dataId: string) => {
     dispatch(openRightModal({ modalOption: "Product", dataId }));
   };
 
@@ -180,13 +182,13 @@ export default function ProductTable({ tableData }: ITable) {
           {table.getHeaderGroups().map((headerGroup) => (
             <TrHeader key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                console.log(header);
+                // console.log(header);
                 return (
                   <Th
                     key={header.id}
                     colSpan={header.colSpan}
                     style={{
-                      flex: idToColFlex[header.id as keyof IOrder] || 1,
+                      flex: idToColFlex[header.id as keyof IProduct] || 1,
                     }}
                   >
                     {header.isPlaceholder ? null : (
@@ -210,18 +212,23 @@ export default function ProductTable({ tableData }: ITable) {
                               fontWeight: "normal",
                             }}
                           >
-                            {idToLabel[header.id as keyof IOrder] ?? header.id}
+                            {idToLabel[header.id as keyof IProduct] ??
+                              header.id}
                           </TextMain>
                           {{
                             asc: " 🔼",
                             desc: " 🔽",
                           }[header.column.getIsSorted() as string] ?? null}
                         </div>
-                        {header.column.getCanFilter() ? (
+                        {/* 필터! */}
+                        {/* {header.column.getCanFilter() ? (
                           <div>
-                            <ClientFilter column={header.column} />
+                            <ClientFilter
+                              column={header.column}
+                              tableType="Product"
+                            />
                           </div>
-                        ) : null}
+                        ) : null} */}
                       </>
                     )}
                   </Th>
@@ -236,14 +243,15 @@ export default function ProductTable({ tableData }: ITable) {
               <TrBody
                 key={row.id}
                 index={i}
-                onClick={() => onRowPress("12345")}
+                onClick={() => openProductPage(row.original.productNo)}
               >
                 {row.getVisibleCells().map((cell) => {
                   return (
                     <Td
                       key={cell.id}
                       style={{
-                        flex: idToColFlex[cell.column.id as keyof IOrder] || 1,
+                        flex:
+                          idToColFlex[cell.column.id as keyof IProduct] || 1,
                       }}
                     >
                       {flexRender(
@@ -342,8 +350,9 @@ const TBody = styled.tbody``;
 const Th = styled.th``;
 
 const TrHeader = styled.tr`
-  height: 80px;
+  height: 40px;
   display: flex;
+  align-items: center;
   background-color: ${colors.dark};
 `;
 
@@ -352,6 +361,10 @@ const TrBody = styled.tr<{ index: number }>`
   display: flex;
   background-color: ${({ index }) =>
     index % 2 === 0 ? colors.backgroundLight : colors.white};
+  :hover {
+    cursor: pointer;
+    background-color: ${colors.highlight2};
+  }
 `;
 
 const Td = styled.td`

@@ -3,7 +3,7 @@ import { fakerKO as faker, ko } from "@faker-js/faker";
 import { IOrder } from "../api/types/order";
 import { IProduct } from "../api/types/product";
 
-const createRandomOrder = (): IOrder => {
+const createRandomOrder = (): any => {
   return {
     statusNm: faker.helpers.arrayElement([
       "checking",
@@ -25,7 +25,7 @@ export const makeOrderData = (num: number) => {
   return Array.from({ length: num }, createRandomOrder);
 };
 
-const createRandomProduct = (): IProduct => {
+const createRandomProduct = (): any => {
   return {
     calorie: String(faker.number.int({ min: 10, max: 800 })),
     carb: String(faker.number.int({ min: 0, max: 120 })),

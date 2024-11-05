@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { colors } from "../../../shared/colors";
+import { colors } from "../../../shared/styles/colors";
 import { Col, Icon, Row, TextMain } from "../../../shared/ui/styledComps";
 import { icons } from "../../../shared/iconSource";
 import ToggleBtn from "../../../shared/ui/ToggleBtn";
@@ -10,29 +10,34 @@ import {
   setEndDate,
   setOrderSearchText,
   setStartDate,
-  toggleOrderStatusBtn,
-  toggleRequestBtn,
+  setResultStatusCd,
+  setRequestStatusCd,
+  IResultStatusCd,
+  IRequestCd,
 } from "../../../features/filter/orderFilterSlice";
 import SquareInput from "../../../shared/ui/SquareInput";
+import { useListAdmOrder } from "../../../shared/api/query/order";
+import { useResponsiveWidth } from "../../../shared/util/hooks";
+import { useState } from "react";
 
 const FILTER_BTNS: {
-  [K in keyof IOrderFilterState]: {
-    name: keyof IOrderFilterState[K];
-    label: string;
-  }[];
+  date: { name: string; label: string }[];
+  resultStatus: { cd: IResultStatusCd; label: string }[];
+  request: { cd: IRequestCd; label: string }[];
+  search: { name: string; label: string }[];
 } = {
   date: [{ name: "total", label: "전체" }],
-  orderStatus: [
-    { name: "total", label: "전체" },
-    { name: "checking", label: "확인중" },
-    { name: "complete", label: "주문완료" },
-    { name: "noStock", label: "재고없음" },
-    { name: "refund", label: "환불" },
+  resultStatus: [
+    { cd: "", label: "전체" },
+    { cd: "SP013001", label: "확인중" },
+    { cd: "SP013002", label: "재고없음" },
+    { cd: "SP013003", label: "환불요청" },
+    { cd: "SP013004", label: "처리완료" },
   ],
   request: [
-    { name: "total", label: "전체" },
-    { name: "refund", label: "환불" },
-    { name: "replace", label: "교환" },
+    { cd: "", label: "전체" },
+    { cd: "SP014001", label: "환불" },
+    { cd: "SP014002", label: "교환" },
   ],
   search: [],
 };
@@ -40,12 +45,32 @@ const FILTER_BTNS: {
 const Filter = () => {
   // redux
   const dispatch = useAppDispatch();
-  const { date, orderStatus, request, search } = useAppSelector(
+  const { date, resultStatusCd, requestCd, search } = useAppSelector(
     (state) => state.orderFilter
   );
 
+  // react-query
+  const { data: orderData, refetch: refetchOrder } = useListAdmOrder({
+    startDate: date.startDate,
+    endDate: date.endDate,
+    resultStatusCd,
+    searchText: search,
+    enabled: false,
+  });
+
+  // useState
+  const [boxWidth, setBoxWidth] = useState<string>("100%");
+  useResponsiveWidth({
+    width1: "100%",
+    width2: "70%",
+    width3: "50%",
+    bp1_2: 960,
+    bp2_3: 1600,
+    setWidth: setBoxWidth,
+  });
+
   return (
-    <Box>
+    <Box style={{ width: boxWidth }}>
       <Col style={{ flex: 1, rowGap: 16 }}>
         {/* 날짜 */}
         <ItemRow>
@@ -72,34 +97,37 @@ const Filter = () => {
             />
           </RowWrap>
         </ItemRow>
+
         {/* 주문상태 */}
         <ItemRow>
           <ItemText>주문상태</ItemText>
           <RowWrap>
-            {FILTER_BTNS.orderStatus.map((btn) => (
+            {FILTER_BTNS.resultStatus.map((btn) => (
               <ToggleBtn
-                key={btn.name}
+                key={btn.cd}
                 btnText={btn.label}
-                isActive={orderStatus[btn.name]}
-                onClick={() => dispatch(toggleOrderStatusBtn(btn.name))}
+                isActive={btn.cd === resultStatusCd}
+                onClick={() => dispatch(setResultStatusCd(btn.cd))}
               />
             ))}
           </RowWrap>
         </ItemRow>
+
         {/* 요청사항 */}
         <ItemRow>
           <ItemText>요청사항</ItemText>
           <RowWrap>
             {FILTER_BTNS.request.map((btn) => (
               <ToggleBtn
-                key={btn.name}
+                key={btn.cd}
                 btnText={btn.label}
-                isActive={request[btn.name]}
-                onClick={() => dispatch(toggleRequestBtn(btn.name))}
+                isActive={btn.cd === requestCd}
+                onClick={() => dispatch(setRequestStatusCd(btn.cd))}
               />
             ))}
           </RowWrap>
         </ItemRow>
+
         {/* 검색 */}
         <ItemRow>
           <ItemText>검색</ItemText>
@@ -111,7 +139,7 @@ const Filter = () => {
           />
         </ItemRow>
       </Col>
-      <SearchBtn>
+      <SearchBtn onClick={() => refetchOrder()}>
         <Col style={{ alignItems: "center" }}>
           <Icon size={36} src={icons.search_white_36} />
           <SearchBtnText>검색</SearchBtnText>
@@ -143,6 +171,11 @@ const SearchBtn = styled.button`
   justify-content: center;
   border-radius: 5px;
   margin-left: 40px;
+  border: none;
+  :hover {
+    cursor: pointer;
+    background-color: ${colors.darker};
+  }
 `;
 
 const SearchBtnText = styled(TextMain)`

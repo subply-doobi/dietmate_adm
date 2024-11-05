@@ -37,8 +37,10 @@ function DebouncedInput({
 
 export default function ClientFilter({
   column,
+  tableType,
 }: {
   column: Column<any, unknown>;
+  tableType: "Product" | "Order";
 }) {
   const columnFilterValue = column.getFilterValue();
   const { filterVariant } = column.columnDef.meta ?? {};
@@ -74,11 +76,22 @@ export default function ClientFilter({
       value={columnFilterValue?.toString()}
     >
       {/* See faceted column filters example for dynamic select options */}
-      <option value="">전체</option>
-      <option value="checking">확인중</option>
-      <option value="complete">주문완료</option>
-      <option value="noStock">재고없음</option>
-      <option value="refund">환불</option>
+      {tableType === "Order" ? (
+        <>
+          <option value="">전체</option>
+          <option value="확인중">확인중</option>
+          <option value="주문완료">주문완료</option>
+          <option value="재고없음">재고없음</option>
+          <option value="환불">환불</option>
+        </>
+      ) : (
+        <>
+          <option value="">전체</option>
+          <option value="판매중">판매중</option>
+          <option value="재고없음">재고없음</option>
+          <option value="영구삭제">영구삭제</option>
+        </>
+      )}
     </select>
   ) : (
     <DebouncedInput

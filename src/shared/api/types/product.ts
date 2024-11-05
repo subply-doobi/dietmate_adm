@@ -5,24 +5,20 @@ export interface IProduct {
   categoryCd: string;
   categoryNm: string;
   cholesterol: string;
-  dietNo: string;
-  dietSeq: string;
   distributerBizNo: string;
   distributerNm: string;
   fat: string;
   fiber: string;
   freeShippingPrice: string;
   freeShippingYn: string;
+  itemReportNo: string;
+  link1: string;
+  link2: string;
   mainAttId: string;
   mainAttUrl: string;
-  manufacturerBizNo: string;
-  manufacturerNm: string;
   minQty: string;
   platformNm: string;
   price: string;
-  priceCalorieCompare: string;
-  priceProteinCompare: string;
-  productChoiceYn: string;
   productNm: string;
   productNo: string;
   protein: string;
@@ -30,23 +26,59 @@ export interface IProduct {
   servingSize: string;
   shippingPrice: string;
   sodium: string;
-  subAttId: string;
-  subAttUrl: string;
+  statusCd: string;
+  statusNm: string;
   subCategoryCd: string;
   subCategoryNm: string;
   sugar: string;
+  tags: string;
   transFat: string;
+  imgLinks: string;
+}
+
+// TBD
+export interface ICreateProduct {
+  [key: string]: string;
+  // baseInfo
+  tags: string;
+  statusCd: string;
+  productNm: string;
+  platformNm: string;
+  categoryCd: string;
+  subCategoryCd: string;
+  price: string;
+  shippingPrice: string;
+  freeShippingYn: string;
+  freeShippingPrice: string;
   link1: string;
   link2: string;
-  itemReportNo: string;
+  imageLinks: string; // Renamed from imgLinks
 
-  // temp
-  statusNm: "판매중" | "재고없음" | "영구삭제" | string;
-  detailLink1: string;
-  detailLink2: string;
-  detailLink3: string;
-  detailLink4: string;
-  detailLink5: string;
+  // nutrInfo
+  servingSize: string; // Added as it was not in the original interface
+  calorie: string;
+  carb: string;
+  protein: string;
+  fat: string;
+  sodium: string;
+  sugar: string;
+  fiber: string;
+  cholesterol: string;
+  transFat: string;
+  saturatedFat: string;
+
+  // additionalInfo
+  manufacturerNm: string; // Added as it was not in the original interface
+  manufactureBizNo: string; // Added as it was not in the original interface
+  distributerNm: string;
+  distributerBizNo: string;
+  itemReportNo: string;
+}
+
+export interface IProductDetail {
+  productNo: string;
+  seq: string;
+  imageLink: string;
 }
 
 export interface IProductSummary {

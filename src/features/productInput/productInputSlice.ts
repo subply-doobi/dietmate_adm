@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { validate } from "../../shared/util/validation";
-import { IProduct } from "../../shared/api/types/product";
+import { IProduct, IProductDetail } from "../../shared/api/types/product";
 
 interface Field {
   value: string;
@@ -10,23 +10,17 @@ interface Field {
 
 export interface IProductInputState {
   // base info
-  statusNm: {
-    value: "판매중" | "재고없음" | "영구삭제";
-    errMsg: string;
-    isValid: boolean;
-  };
+  status: Field;
   productNm: Field;
   platformNm: Field;
-  category: {
-    value: "도시락" | "샐러드" | "닭가슴살" | "영양간식" | "과자" | "음료";
-    errMsg: string;
-    isValid: boolean;
-  };
+  category: Field;
   subCategory: Field;
   price: Field;
   shippingPrice: Field;
   freeShippingPrice: Field;
   freeShippingYn: Field;
+  link1: Field;
+  link2: Field;
   detailLink1: Field;
   detailLink2: Field;
   detailLink3: Field;
@@ -60,24 +54,27 @@ const initialFieldTrue: Field = {
 };
 
 const initialState: IProductInputState = {
-  statusNm: {
-    value: "판매중",
+  status: {
+    value: "SP012001",
     errMsg: "",
     isValid: true,
   },
   productNm: initialFieldFalse,
   platformNm: initialFieldFalse,
-  category: { value: "도시락", errMsg: "", isValid: true },
+  category: { value: "CG001", errMsg: "", isValid: true },
   subCategory: initialFieldFalse,
   price: initialFieldFalse,
   shippingPrice: initialFieldFalse,
   freeShippingPrice: initialFieldFalse,
   freeShippingYn: initialFieldFalse,
+  link1: initialFieldTrue,
+  link2: initialFieldTrue,
   detailLink1: initialFieldTrue,
   detailLink2: initialFieldTrue,
   detailLink3: initialFieldTrue,
   detailLink4: initialFieldTrue,
   detailLink5: initialFieldTrue,
+
   content: initialFieldFalse,
   calorie: initialFieldFalse,
   sodium: initialFieldFalse,
@@ -91,20 +88,62 @@ const initialState: IProductInputState = {
   cholesterol: initialFieldFalse,
 };
 
+export type ILoadActionObj = {
+  [K in keyof IProductInputState]: IProductInputState[K]["value"];
+};
+interface ILoadAction {
+  product: IProduct;
+  productDetail: IProductDetail[];
+}
 const productInputSlice = createSlice({
   name: "productInput",
   initialState,
   reducers: {
-    loadProduct: (state, action: PayloadAction<IProduct>) => {
-      const loadList = Object.keys(action.payload) as Array<
-        keyof IProductInputState
-      >;
+    initializeProductInput: () => initialState,
+    loadProduct: (state, action: PayloadAction<ILoadAction>) => {
+      const p = action.payload.product;
+      const d = action.payload.productDetail;
+      d.length > 5 && d.splice(5, d.length - 5);
+      const detailLinks: {
+        [key: string]: string;
+      } = {};
+      for (let i = 0; i < 5; i++) {
+        detailLinks[`detailLink${i + 1}`] = d[i]?.imageLink || "";
+      }
+      const dataToLoad: Partial<ILoadActionObj> = {
+        // baseInfo
+        status: p.statusCd,
+        productNm: p.productNm,
+        platformNm: p.platformNm,
+        category: p.categoryCd,
+        subCategory: p.subCategoryCd,
+        price: p.price,
+        shippingPrice: p.shippingPrice,
+        freeShippingYn: p.freeShippingYn,
+        freeShippingPrice: p.freeShippingPrice,
+        link1: p.link1,
+        link2: p.link2,
+        //nutrInfo
+        content: String(parseFloat(p.servingSize)),
+        calorie: String(parseFloat(p.calorie)),
+        sodium: String(parseFloat(p.sodium)),
+        carb: String(parseFloat(p.carb)),
+        sugar: String(parseFloat(p.sugar)),
+        fiber: String(parseFloat(p.fiber)),
+        fat: String(parseFloat(p.fat)),
+        transFat: String(parseFloat(p.transFat)),
+        saturatedFat: String(parseFloat(p.saturatedFat)),
+        protein: String(parseFloat(p.protein)),
+        cholesterol: String(parseFloat(p.cholesterol)),
+        ...detailLinks,
+      };
+      const loadList = Object.keys(dataToLoad) as (keyof IProductInputState)[];
       loadList.forEach((key) => {
         // set value
-        state[key].value = action.payload[key];
+        state[key].value = dataToLoad[key] || "";
 
         // validation
-        const { errMsg, isValid } = validate[key]?.(action.payload[key]) || {
+        const { errMsg, isValid } = validate[key]?.(dataToLoad[key] || "") || {
           errMsg: "",
           isValid: true,
         };
@@ -117,6 +156,13 @@ const productInputSlice = createSlice({
       action: PayloadAction<{ key: keyof IProductInputState; value: string }>
     ) => {
       const { key, value } = action.payload;
+
+      if (key === "category") {
+        state.subCategory.value = "";
+        const v = validate["subCategory"]?.("");
+        state.subCategory.errMsg = v?.errMsg || "";
+        state.subCategory.isValid = v?.isValid || false;
+      }
       if (!validate[key]) {
         console.log("no validation function for this key");
         state[key].value = value;
@@ -139,6 +185,11 @@ const productInputSlice = createSlice({
   },
 });
 
-export const { resetProductInput, setValue } = productInputSlice.actions;
+export const {
+  loadProduct,
+  resetProductInput,
+  setValue,
+  initializeProductInput,
+} = productInputSlice.actions;
 
 export default productInputSlice.reducer;

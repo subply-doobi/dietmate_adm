@@ -1,52 +1,75 @@
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { Icon, Row, TextMain } from "../../../shared/ui/styledComps";
-import { colors } from "../../../shared/colors";
-import { testOrderedProducts } from "../../../shared/consts";
+import { colors } from "../../../shared/styles/colors";
 import styled from "styled-components";
-import { IOrderedProduct } from "../../../shared/api/types/order";
+import { IOrder, IOrderedProduct } from "../../../shared/api/types/order";
 import { IProduct } from "../../../shared/api/types/product";
 import { icons } from "../../../shared/iconSource";
-
-const DROPDOWN_LIST = ["확인중", "주문완료", "재고없음", "환불"];
-const statusNmToColor: { [key: string]: string } = {
-  확인중: colors.yellowBadge,
-  주문완료: colors.purpleBadge,
-  재고없음: colors.redBadge,
-  환불: colors.line,
-};
+import {
+  useListAdmOrder,
+  useUpdateAdmOrderResult,
+} from "../../../shared/api/query/order";
+import { useAppDispatch, useAppSelector } from "../../../app/reduxStore/hooks";
+import { ORDER_RESULT_STATUS_CD_OBJ } from "../../../shared/consts";
+import { closeRightModal } from "../../../features/modal/modalSlice";
 
 // type guard
 const isIOrderedProduct = (
-  data: IOrderedProduct | IProduct | undefined
-): data is IOrderedProduct => {
+  data: IOrder | IProduct | undefined
+): data is IOrder => {
   if (!data) return false;
-  return (data as IOrderedProduct)["buyDate"] !== undefined;
+  return (data as IOrder)["orderDate"] !== undefined;
 };
 
 const BaseInfo = () => {
   // redux
-  // const {data} = useAppSelector(state => state.rightModal);
-  const data = testOrderedProducts[0];
+  const dispatch = useAppDispatch();
+  const { dataId } = useAppSelector((state) => state.rightModal);
+  const { date, resultStatusCd, requestCd, search } = useAppSelector(
+    (state) => state.orderFilter
+  );
+
   // useState
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
 
+  // react-query
+  const { data: orderData, refetch: refetchOrder } = useListAdmOrder({
+    startDate: date.startDate,
+    endDate: date.endDate,
+    resultStatusCd,
+    searchText: search,
+    enabled: false,
+  });
+  const updateAdmORMutation = useUpdateAdmOrderResult();
+
+  const { currentOrder } = useMemo(() => {
+    if (!orderData) return { currentResultStatusCd: {} };
+    const currentOrder = orderData.find((d) => d.orderNo === dataId);
+    return { currentOrder };
+  }, [orderData]);
+
   // type guard
-  if (!isIOrderedProduct(data)) return null;
+  // if (!isIOrderedProduct(testD)) return null;
 
   const BASE_INFO: {
     [key: string]: string;
   } = {
-    주문번호: data?.orderNo,
-    주문자: `${data?.buyerName} (${data?.buyerTel})`,
-    주소: `${data.buyerAddr} (${data.buyerZipCode})`,
-    배송참고: data.customData || "없음",
-    주문금액: `${data.orderPrice}원`,
-    배송비: `${data.shippingPrice}원`,
+    주문번호: currentOrder?.orderNo || "",
+    주문자: `${currentOrder?.buyerName} (${currentOrder?.buyerTel})`,
+    주소: `${currentOrder?.buyerAddr} (${currentOrder?.buyerZipCode})`,
+    배송참고: currentOrder?.customData || "없음",
+    주문금액: `${currentOrder?.orderPrice}원`,
+    배송비: `${currentOrder?.shippingPrice}원`,
   };
 
-  const changeStatus = (status: string) => {
-    console.log(`${status}로 변경!`);
+  const changeStatus = (statusCd: string) => {
+    console.log(`no: ${currentOrder?.orderNo}, ${statusCd}로 변경!`);
+    updateAdmORMutation.mutate({
+      orderNo: dataId,
+      resultStatusCd: statusCd,
+    });
     setIsDropDownOpen(false);
+    dispatch(closeRightModal());
   };
 
   return (
@@ -61,11 +84,16 @@ const BaseInfo = () => {
       </BaseBox>
       <StatusBtn
         style={{
-          backgroundColor: statusNmToColor[data.statusNm] || colors.white,
+          backgroundColor:
+            ORDER_RESULT_STATUS_CD_OBJ[
+              currentOrder?.resultStatusCd || "SP013001"
+            ].color,
         }}
         onClick={() => setIsDropDownOpen(true)}
       >
-        <Desc style={{ color: colors.white }}>{data?.statusNm}</Desc>
+        <Desc style={{ color: colors.white }}>
+          {currentOrder?.resultStatusNm}
+        </Desc>
       </StatusBtn>
       {isDropDownOpen && (
         <DropDown>
@@ -78,16 +106,18 @@ const BaseInfo = () => {
               marginTop: 16,
             }}
           >
-            {DROPDOWN_LIST.map((status, idx) => (
+            {Object.keys(ORDER_RESULT_STATUS_CD_OBJ).map((status, idx) => (
               <StatusBtn
                 key={idx}
                 style={{
                   marginTop: 0,
-                  backgroundColor: statusNmToColor[status],
+                  backgroundColor: ORDER_RESULT_STATUS_CD_OBJ[status].color,
                 }}
                 onClick={() => changeStatus(status)}
               >
-                <Desc style={{ color: colors.white }}>{status}</Desc>
+                <Desc style={{ color: colors.white }}>
+                  {ORDER_RESULT_STATUS_CD_OBJ[status].label}
+                </Desc>
               </StatusBtn>
             ))}
           </Row>
