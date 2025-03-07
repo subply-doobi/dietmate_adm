@@ -5,7 +5,11 @@ import reportWebVitals from "./reportWebVitals";
 import "./index.css";
 import "./shared/styles/font.css";
 
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  createHashRouter,
+} from "react-router-dom";
 import Order from "./screens/order/Order";
 import Product from "./screens/product/Product";
 import { Provider } from "react-redux";
@@ -14,7 +18,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import KakaoLogin from "./screens/login/KakaoLogin";
 import { queryClient } from "./app/reactQueryStore/reactQueryStore";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <App />,

@@ -38,7 +38,7 @@ const FILTER_BTNS = {
     { name: "포켓샐러드", label: "포켓샐러드" },
     { name: "바르닭", label: "바르닭" },
     { name: "샐러드판다", label: "샐러드판다" },
-    { name: "다이어트메이트", label: "다이어트메이트" },
+    { name: "근의공식", label: "근의공식" },
   ],
 };
 
@@ -48,6 +48,7 @@ const Filter = () => {
   const productFilterState = useAppSelector((state) => state.productFilter);
   const { productStatus, category, platformNm, search } = productFilterState;
 
+  console.log(productFilterState);
   // react-query
   const { refetch: refetchProduct } = useListAdmProduct({
     enabled: false,
