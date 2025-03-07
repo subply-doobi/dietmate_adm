@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.1dd02803.css",
+    "main.js": "/static/js/main.d28120d8.js",
+    "static/js/453.82ff8b36.chunk.js": "/static/js/453.82ff8b36.chunk.js",
+    "static/media/KotraHope.woff": "/static/media/KotraHope.a920d06f7bf6e43e6d7c.woff",
+    "static/media/appIcon.png": "/static/media/appIcon.feb9abfd3faa6ecb9392.png",
+    "static/media/appIcon_black.png": "/static/media/appIcon_black.176cee184e1939813603.png",
+    "static/media/NotoSansKRMedium.woff": "/static/media/NotoSansKRMedium.166cf521f74c8457c799.woff",
+    "static/media/NotoSansKR.woff": "/static/media/NotoSansKR.f03cce39f0a68b3d752f.woff",
+    "static/media/NotoSansKRBold.woff": "/static/media/NotoSansKRBold.041fff60b2fcd8e39f06.woff",
+    "static/media/NotoSansKRBlack.woff": "/static/media/NotoSansKRBlack.c530b9920b6b22dfc146.woff",
+    "index.html": "/index.html",
+    "main.1dd02803.css.map": "/static/css/main.1dd02803.css.map",
+    "main.d28120d8.js.map": "/static/js/main.d28120d8.js.map",
+    "453.82ff8b36.chunk.js.map": "/static/js/453.82ff8b36.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1dd02803.css",
+    "static/js/main.d28120d8.js"
+  ]
+}
