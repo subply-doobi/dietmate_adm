@@ -20,6 +20,11 @@ export default function KakaoLogin() {
       const kakaoTokenRes = await getKLTokenMutation.mutateAsync({
         authCode: code,
       });
+      console.log(
+        "KakaoLogin: kakaoTokenRes: ",
+        kakaoTokenRes.access_token,
+        kakaoTokenRes.refresh_token
+      );
       await storeDoobiToken(kakaoTokenRes.access_token);
 
       // 1 second delay

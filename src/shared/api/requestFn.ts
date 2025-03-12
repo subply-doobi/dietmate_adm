@@ -20,6 +20,7 @@ export const requestFn = async <T, R>({
   let token: string | null = needAuth
     ? localStorage.getItem("accessToken")
     : null;
+  console.log("requestFn: ", token);
   if (needAuth && !token) {
     throw new Error("No token");
   }

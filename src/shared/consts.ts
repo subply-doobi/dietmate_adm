@@ -1,10 +1,13 @@
 import { colors } from "./styles/colors";
+const isDevelopment = process.env.NODE_ENV === "development";
 
 // KL
 export const KLRestAPIKey = "ce0c93f9c72a7109b40d11b91ac54732";
 export const KLJSKey = "87a8114121bb2a957da769a7ccb462d0";
 // KLAuth
-export const KLRedirectUrl = "http://localhost:3000/kakaoLogin";
+export const KLRedirectUrl = isDevelopment
+  ? "http://localhost:3000/kakaoLogin"
+  : "https://subply-doobi.github.io/dietmate_adm/kakaoLogin";
 export const KLAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KLRestAPIKey}&redirect_uri=${KLRedirectUrl}&response_type=code`;
 
 // COMMON_CODE

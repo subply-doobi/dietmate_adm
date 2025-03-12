@@ -7,7 +7,6 @@ import RightModal from "./shared/ui/RightModal";
 import Login from "./screens/login/Login";
 import { useEffect, useState } from "react";
 import { validateToken } from "./shared/api/query/token";
-import { useListAdmProduct } from "./shared/api/query/product";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
