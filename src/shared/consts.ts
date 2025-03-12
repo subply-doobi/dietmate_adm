@@ -6,8 +6,8 @@ export const KLRestAPIKey = "ce0c93f9c72a7109b40d11b91ac54732";
 export const KLJSKey = "87a8114121bb2a957da769a7ccb462d0";
 // KLAuth
 export const KLRedirectUrl = isDevelopment
-  ? "http://localhost:3000/kakaoLogin"
-  : "https://subply-doobi.github.io/dietmate_adm/kakaoLogin";
+  ? "http://localhost:3000/"
+  : "https://subply-doobi.github.io/dietmate_adm/";
 export const KLAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KLRestAPIKey}&redirect_uri=${KLRedirectUrl}&response_type=code`;
 
 // COMMON_CODE

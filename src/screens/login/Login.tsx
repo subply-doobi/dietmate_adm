@@ -2,8 +2,9 @@ import styled from "styled-components";
 import { colors } from "../../shared/styles/colors";
 import { Row } from "../../shared/ui/styledComps";
 import { KLAuthUrl } from "../../shared/consts";
+import LoadingContent from "../../components/loading/LoadingContent";
 
-const Login = () => {
+const Login = ({ isLoggingIn }: { isLoggingIn: boolean }) => {
   const logoSource = require("../../shared/img/appIcon_black.png");
 
   const handleLogin = async () => {
@@ -13,11 +14,15 @@ const Login = () => {
   return (
     <Container>
       <Box>
+        {isLoggingIn ? (
+          <LoadingContent msg="kakao login processing" />
+        ) : (
+          <Row style={{ alignItems: "flex-end" }}>
+            <Logo src={logoSource} alt="DM Logo" />
+            <Title>DM 관리자</Title>
+          </Row>
+        )}
         {/* logo */}
-        <Row style={{ alignItems: "flex-end" }}>
-          <Logo src={logoSource} alt="DM Logo" />
-          <Title>DM 관리자</Title>
-        </Row>
         <KakaoLoginBtn onClick={handleLogin}>카카오 로그인</KakaoLoginBtn>
       </Box>
     </Container>

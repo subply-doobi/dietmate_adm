@@ -65,7 +65,7 @@ const ProductRMContent = () => {
     enabled: isUpdating,
   });
 
-  console.log("ProductRMContent: productInputState:", productInputState);
+  // console.log("ProductRMContent: productInputState:", productInputState);
   useEffect(() => {
     if (!product || !productDetail) return;
     dispatch(loadProduct({ product, productDetail }));

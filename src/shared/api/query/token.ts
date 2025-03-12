@@ -35,11 +35,11 @@ export const reissueDoobiToken = async () => {
 };
 
 export const validateToken = async () => {
-  console.log("validateToken: start");
+  // console.log("validateToken: start");
   let isValid = false;
   try {
     // 인증 여부 조회
-    console.log("request GET_AUTH");
+    // console.log("request GET_AUTH");
     await requestFn({ url: GET_AUTH });
     isValid = true;
 
@@ -48,7 +48,7 @@ export const validateToken = async () => {
     console.log("error in GET_AUTH");
     if (!(e instanceof AxiosError)) return isValid;
 
-    console.log("GET_AUTH status:", e.response?.status);
+    // console.log("GET_AUTH status:", e.response?.status);
     // 토큰 재발급 (401에러인 경우만 재발급 시도)
     if (e.response?.status !== 401) return isValid;
     try {
@@ -62,7 +62,7 @@ export const validateToken = async () => {
       // 토큰 재발급 오류
     } catch (e) {
       if (!(e instanceof AxiosError)) return isValid;
-      console.log("error in reIssue: ", e.response?.status);
+      // console.log("error in reIssue: ", e.response?.status);
       console.log("login needed");
     }
   }
