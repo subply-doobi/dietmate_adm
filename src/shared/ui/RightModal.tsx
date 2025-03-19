@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../app/reduxStore/hooks";
 import { closeRightModal } from "../../features/modal/modalSlice";
 import OrderRMContent from "../../components/modalContent/OrderRMContent";
 import ProductRMContent from "../../components/modalContent/ProductRMContent";
+import { useEffect } from "react";
 
 const modalOptionToComponent: {
   [key: string]: React.ReactNode;
@@ -22,6 +23,19 @@ export default function RightModal({}: IRightModal) {
   const { isRMVisible, modalOption, dataId } = useAppSelector(
     (state) => state.rightModal
   );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        dispatch(closeRightModal());
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [dispatch]);
 
   if (!isRMVisible) {
     return null;

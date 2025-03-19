@@ -55,6 +55,12 @@ const runErrorActionByCode = (code: IErrorCode | undefined | null) => {
     action && action();
     return;
   }
+
+  // 정의된 것 없는 경우
+  console.error(`No action for errorCode: ${code}`);
+  window.confirm(getMsgByCode(code));
+  window.location.href = "/";
+  return;
 };
 
 // 에러 핸들러
