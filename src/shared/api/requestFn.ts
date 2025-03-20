@@ -5,7 +5,6 @@ interface IRequestFnParams<T> {
   method?: "get" | "post" | "put" | "delete";
   data?: T;
   needAuth?: boolean;
-  withCredentials?: boolean;
   headers?: { [key: string]: string };
 }
 
@@ -14,7 +13,6 @@ export const requestFn = async <T, R>({
   method = "get",
   data,
   needAuth = true,
-  withCredentials = false,
   headers = {},
 }: IRequestFnParams<T>): Promise<R> => {
   let token: string | null = needAuth
@@ -28,6 +26,9 @@ export const requestFn = async <T, R>({
   // console.log("requestFn: ", url);
   // console.log("meghod:", method);
   // console.log("token: ", token);
+  // console.log("data: ", data);
+  // console.log("needAuth: ", needAuth);
+  // console.log("headers: ", headers);
   const axiosConfig: AxiosRequestConfig = {
     url,
     method,
@@ -37,7 +38,6 @@ export const requestFn = async <T, R>({
       ...headers,
       ...(needAuth && token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    withCredentials,
   };
 
   const res = await axios(axiosConfig);

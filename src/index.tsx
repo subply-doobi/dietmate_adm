@@ -11,7 +11,6 @@ import Product from "./screens/product/Product";
 import { Provider } from "react-redux";
 import { store } from "./app/reduxStore/reduxStore";
 import { QueryClientProvider } from "@tanstack/react-query";
-import KakaoLogin from "./screens/login/KakaoLogin";
 import { queryClient } from "./app/reactQueryStore/reactQueryStore";
 
 const router = createHashRouter([
@@ -29,10 +28,6 @@ const router = createHashRouter([
       },
     ],
   },
-  {
-    path: "kakaoLogin",
-    element: <KakaoLogin />,
-  },
 ]);
 
 const root = ReactDOM.createRoot(
@@ -40,14 +35,13 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <React.StrictMode>
-    {/* redux store */}
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </Provider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </Provider>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
