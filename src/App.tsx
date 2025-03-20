@@ -11,47 +11,8 @@ import { useGetKLToken } from "./shared/api/query/login";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
-  const navigate = useNavigate();
   const location = useLocation();
   console.log("App: location: ", location);
-
-  const getKLTokenMutation = useGetKLToken();
-
-  useEffect(() => {
-    const login = async () => {
-      const isValid = await validateToken();
-      // console.log("App: token isValid: ", isValid);
-      if (isValid) {
-        setIsLoggedIn(true);
-        // window.location.href = "/#/product";
-        navigate("/product", { replace: true });
-        return;
-      }
-
-      setIsLoggingIn(true);
-      const code = new URL(window.location.href).searchParams.get("code");
-      console.log("App: code: ", code);
-      if (!code) return;
-      const kakaoTokenRes = await getKLTokenMutation.mutateAsync({
-        authCode: code,
-      });
-      // console.log(
-      //   "KakaoLogin: kakaoTokenRes: ",
-      //   kakaoTokenRes.access_token,
-      //   kakaoTokenRes.refresh_token
-      // );
-      await storeDoobiToken(kakaoTokenRes.access_token);
-
-      // 1 second delay
-      setTimeout(() => {
-        setIsLoggingIn(false);
-        navigate("/product", { replace: true });
-      }, 2000);
-    };
-
-    login();
-  }, []);
 
   return (
     <Container>
@@ -64,7 +25,7 @@ function App() {
           <RightModal />
         </>
       ) : (
-        <Login isLoggingIn={isLoggingIn} />
+        <Login setIsLoggedIn={setIsLoggedIn} />
       )}
     </Container>
   );
