@@ -1,4 +1,4 @@
-export const BASE_URL = "http://54.180.29.212:8080";
+export const BASE_URL = "http://52.79.166.251:8080";
 
 // KL token
 export const KLTokenUrl = `https://kauth.kakao.com/oauth/token`;
